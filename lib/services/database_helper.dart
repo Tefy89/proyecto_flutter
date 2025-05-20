@@ -16,20 +16,21 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'my_notes_v2.db');
+    String path = join(await getDatabasesPath(), 'my_notes_v3.db');
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(''' 
-      CREATE TABLE notes(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        content TEXT,
-        color TEXT,
-        dateTime TEXT
-      )
-    ''');
+    CREATE TABLE notes(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      content TEXT,
+      color TEXT,
+      dateTime TEXT,
+      isFavorite INTEGER
+    )
+  ''');
   }
 
   Future<int> insertNote(Note note) async {
@@ -57,4 +58,15 @@ class DatabaseHelper {
     final db = await database;
     return await db.delete('notes', where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<List<Note>> getFavoriteNotes() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'notes',
+      where: 'isFavorite = ?',
+      whereArgs: [1],
+    );
+    return List.generate(maps.length, (i) => Note.fromMap(maps[i]));
+  }
+
 }

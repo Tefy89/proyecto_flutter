@@ -91,8 +91,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children:
-                        _colors.map((color) {
+                        children: _colors.map((color) {
                           return GestureDetector(
                             onTap: () => setState(() => _selectedColor = color),
                             child: Container(
@@ -117,12 +116,27 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                   ),
                   InkWell(
                     onTap: () async {
-                      await _saveNote();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),)
-                      );// <-- Aquí envías el resultado
+                      if (_formKey.currentState!.validate()) {
+                        await _saveNote();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text("Campos Vacíos"),
+                            content: Text("Por favor completa todos los campos antes de guardar la nota."),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       margin: EdgeInsets.all(20),
